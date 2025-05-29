@@ -3,8 +3,6 @@ import platform
 import argparse
 import functools
 
-from rich.console import Console
-
 import torch
 from peft import (
     LoraConfig, 
@@ -20,15 +18,13 @@ from transformers import (
     WhisperForConditionalGeneration
 )
 
-from src.aura.data.datasets.asr_modelling import AudioDataset
-from src.aura.callbacks.peft_callback import SavePeftModelCallback
-from src.aura.data.data_collator import DataCollatorSpeechSeq2SeqWithPadding
-from src.aura.utils.data_utils import remove_punctuation, convert_to_simplified_chinese
-from src.aura.utils.model_utils import load_from_checkpoint, print_model_params
-from src.aura.utils.helpers import print_arguments, enable_gradient_for_output, add_argument
-
-# Initialize console for logging
-console = Console()
+from aura.logger import console
+from aura.data.datasets.asr_modelling import AudioDataset
+from aura.callbacks.peft_callback import SavePeftModelCallback
+from aura.data.data_collator import DataCollatorSpeechSeq2SeqWithPadding
+from aura.utils.data_utils import remove_punctuation, convert_to_simplified_chinese
+from aura.utils.model_utils import load_from_checkpoint, print_model_params
+from aura.utils.helpers import print_arguments, enable_gradient_for_output, add_argument
 
 # Initialize argument parser
 parser = argparse.ArgumentParser(description="Script for fine-tuning a Whisper model.")

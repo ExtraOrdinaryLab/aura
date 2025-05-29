@@ -10,7 +10,9 @@ from transformers import (
     WhisperProcessor,
 )
 
-from src.aura.utils.helpers import print_arguments, add_argument
+from aura.logger import console
+from aura.utils.helpers import print_arguments, add_argument
+
 
 def main():
     """
@@ -84,7 +86,7 @@ def main():
     tokenizer.save_pretrained(save_directory)
     processor.save_pretrained(save_directory)
 
-    print(f"Merged model saved to: {save_directory}")
+    console.log(f"Merged model saved to: {save_directory}")
 
 
 if __name__ == "__main__":
