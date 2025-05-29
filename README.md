@@ -1,6 +1,6 @@
-# AURA: Atypical Understanding & Recognition for Accessibility
+# AURA
 
-AURA is a project dedicated to advancing speech recognition for individuals with atypical speech patterns. Leveraging the Speech Accessibility Project (SAP) dataset, we fine-tune state-of-the-art models to improve recognition accuracy and accessibility. Our approach is evaluated on both the SAP and TORGO datasets, demonstrating its robustness across diverse atypical speech scenarios.
+AURA (Atypical Understanding & Recognition for Accessibility) is a project dedicated to advancing speech recognition for individuals with atypical speech patterns. Leveraging the Speech Accessibility Project (SAP) dataset, we fine-tune state-of-the-art models to improve recognition accuracy and accessibility. Our approach is evaluated on both the SAP and TORGO datasets, demonstrating its robustness across diverse atypical speech scenarios.
 
 ## Setup
 
