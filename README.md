@@ -28,3 +28,15 @@ To run the notebook, execute the following command:
 ```bash
 bash lora_finetune.sh
 ```
+
+Merge the LoRA weights with the base model using the following command:
+
+```bash
+bash merge_lora.sh
+```
+
+Evaluate the model on the SAP and TORGO datasets using the following command:
+
+```bash
+bash evaluate.sh
+```
