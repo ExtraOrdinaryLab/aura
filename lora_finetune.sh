@@ -1,8 +1,8 @@
 #!/bin/bash
 
 MODEL_ID="openai/whisper-base"
-TRAIN_MANIFEST="/home/jovyan/workspace/aura/corpus/audio/SAP/train.v2.jsonl"
-TEST_MANIFEST="/home/jovyan/workspace/aura/corpus/audio/SAP/dev.v2.jsonl"
+TRAIN_MANIFEST="/path/to/SAP/train.v2.jsonl"
+TEST_MANIFEST="/path/to/SAP/dev.v2.jsonl"
 LEARNING_RATE="1e-4"
 
 CUDA_VISIBLE_DEVICES=0 python lora_finetune.py \
