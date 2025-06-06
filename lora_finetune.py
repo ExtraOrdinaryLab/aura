@@ -11,8 +11,8 @@ from peft import (
     get_peft_model, 
     prepare_model_for_kbit_training
 )
+from transformers import Seq2SeqTrainer as _Seq2SeqTrainer
 from transformers import (
-    Seq2SeqTrainer, 
     Seq2SeqTrainingArguments, 
     WhisperProcessor, 
     WhisperForConditionalGeneration
@@ -72,6 +72,19 @@ if platform.system() == "Windows":
 # Determine the device (CPU or GPU)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 console.log(f"Device: {device}")
+
+
+class Seq2SeqTrainer(_Seq2SeqTrainer):
+    
+    def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
+        try:
+            return super().compute_loss(model, inputs, return_outputs, num_items_in_batch)
+
+        except Exception as e:
+            console.log(f"[Skipping batch due to exception] {e}")
+            dummy_loss = torch.tensor(0.0, requires_grad=True).to(model.device)
+            return (dummy_loss, None) if return_outputs else dummy_loss
+
 
 def main():
     """Main function for fine-tuning the Whisper model."""
