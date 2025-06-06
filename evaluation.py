@@ -7,8 +7,10 @@ It supports both transcription and translation tasks with configurable
 preprocessing options.
 """
 
+import os
 import gc
 import re
+import json
 import argparse
 import platform
 import functools
@@ -19,6 +21,7 @@ import evaluate
 import numpy as np
 from tqdm import tqdm
 from torch.utils.data import DataLoader
+from transformers.models.whisper.english_normalizer import BasicTextNormalizer
 from transformers import WhisperForConditionalGeneration, WhisperProcessor
 
 from aura.logger import console
@@ -26,6 +29,8 @@ from aura.data.datasets.asr_modelling import AudioDataset
 from aura.data.data_collator import DataCollatorSpeechSeq2SeqWithPadding
 from aura.utils.data_utils import remove_punctuation, convert_to_simplified_chinese
 from aura.utils.helpers import add_argument, print_arguments
+
+normalizer = BasicTextNormalizer()
 
 
 def setup_argument_parser() -> argparse.ArgumentParser:
@@ -39,7 +44,7 @@ def setup_argument_parser() -> argparse.ArgumentParser:
     add_arg = functools.partial(add_argument, argument_parser=parser)
     
     # Data and model paths
-    add_arg("test_data_path", type=str, default="dataset/test.json",
+    add_arg("test_data_path", type=str, default="dataset/test.jsonl",
             help="Path to the test dataset")
     add_arg("model_path", type=str, default="models/whisper-tiny-finetune",
             help="Path to the merged model or HuggingFace model name")
@@ -177,6 +182,9 @@ def preprocess_texts(predictions: List[str], references: List[str], args: argpar
     """
     processed_predictions = predictions[:]
     processed_references = references[:]
+
+    # Remove content in brackets and convert to lowercase for references
+    processed_references = [re.sub(r'\[.*?\]', '', text.lower()).strip() for text in processed_references]
     
     # Remove punctuation if specified
     if args.remove_punctuation:
@@ -189,9 +197,8 @@ def preprocess_texts(predictions: List[str], references: List[str], args: argpar
         processed_references = convert_to_simplified_chinese(processed_references)
     
     # Convert to lowercase
-    processed_predictions = [text.lower() for text in processed_predictions]
-    # Remove content in brackets and convert to lowercase for references
-    processed_references = [re.sub(r'\[.*?\]', '', text.lower()).strip() for text in processed_references]
+    processed_predictions = [normalizer(text) for text in processed_predictions]
+    processed_references = [normalizer(text) for text in processed_references]
     
     return processed_predictions, processed_references
 
