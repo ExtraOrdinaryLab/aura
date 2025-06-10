@@ -140,6 +140,34 @@ def setup_argument_parser() -> argparse.ArgumentParser:
     add_arg("lora_type", type=str, default='lora', choices=['lora', 'ada_lora'],
             help="Type of LoRA configuration to use")
     
+    # Standard LoRA hyperparameters
+    add_arg("lora_r", type=int, default=32,
+            help="LoRA rank (dimension of adaptation)")
+    add_arg("lora_alpha", type=int, default=64,
+            help="LoRA alpha parameter for scaling")
+    add_arg("lora_dropout", type=float, default=0.05,
+            help="LoRA dropout rate")
+    add_arg("lora_bias", type=str, default="none", choices=["none", "all", "lora_only"],
+            help="LoRA bias configuration")
+    
+    # AdaLoRA specific hyperparameters
+    add_arg("ada_lora_init_r", type=int, default=12,
+            help="AdaLoRA initial rank")
+    add_arg("ada_lora_target_r", type=int, default=4,
+            help="AdaLoRA target rank")
+    add_arg("ada_lora_beta1", type=float, default=0.85,
+            help="AdaLoRA beta1 parameter")
+    add_arg("ada_lora_beta2", type=float, default=0.85,
+            help="AdaLoRA beta2 parameter")
+    add_arg("ada_lora_tinit", type=int, default=200,
+            help="AdaLoRA initial warmup steps")
+    add_arg("ada_lora_tfinal", type=int, default=1000,
+            help="AdaLoRA final steps for rank reduction")
+    add_arg("ada_lora_deltaT", type=int, default=10,
+            help="AdaLoRA steps between rank updates")
+    add_arg("ada_lora_orth_reg_weight", type=float, default=0.5,
+            help="AdaLoRA orthogonal regularization weight")
+    
     # System and optimization settings
     add_arg("num_workers", type=int, default=8,
             help="Number of worker processes for data loading")
@@ -272,7 +300,7 @@ def configure_lora(args: argparse.Namespace, model, train_dataset_size: int):
     Configure and apply LoRA or AdaLoRA to the model.
     
     Args:
-        args: Parsed command line arguments
+        args: Parsed command line arguments containing LoRA hyperparameters
         model: Base Whisper model
         train_dataset_size: Size of training dataset for AdaLoRA calculations
         
@@ -287,34 +315,39 @@ def configure_lora(args: argparse.Namespace, model, train_dataset_size: int):
             model, args.resume_from_checkpoint, is_trainable=True
         )
     else:
+        # Define target modules for LoRA adaptation
         target_modules = ["k_proj", "q_proj", "v_proj", "out_proj", "fc1", "fc2"]
         
         if args.lora_type == 'ada_lora':
+            # Calculate total training steps for AdaLoRA
             total_steps = args.num_train_epochs * train_dataset_size
+            
             config = AdaLoraConfig(
-                init_r=12,
-                target_r=4,
-                beta1=0.85,
-                beta2=0.85,
-                tinit=200,
-                tfinal=1000,
-                deltaT=10,
-                lora_alpha=32,
-                lora_dropout=0.1,
-                orth_reg_weight=0.5,
+                init_r=args.ada_lora_init_r,
+                target_r=args.ada_lora_target_r,
+                beta1=args.ada_lora_beta1,
+                beta2=args.ada_lora_beta2,
+                tinit=args.ada_lora_tinit,
+                tfinal=args.ada_lora_tfinal,
+                deltaT=args.ada_lora_deltaT,
+                lora_alpha=args.lora_alpha,
+                lora_dropout=args.lora_dropout,
+                orth_reg_weight=args.ada_lora_orth_reg_weight,
                 target_modules=target_modules,
                 total_step=total_steps
             )
             console.log(f"Using AdaLoRA with {total_steps} total steps")
+            console.log(f"AdaLoRA config: init_r={args.ada_lora_init_r}, target_r={args.ada_lora_target_r}")
+            
         else:  # Standard LoRA
             config = LoraConfig(
-                r=32,
-                lora_alpha=64,
+                r=args.lora_r,
+                lora_alpha=args.lora_alpha,
                 target_modules=target_modules,
-                lora_dropout=0.05,
-                bias="none"
+                lora_dropout=args.lora_dropout,
+                bias=args.lora_bias
             )
-            console.log("Using standard LoRA configuration")
+            console.log(f"Using standard LoRA: r={args.lora_r}, alpha={args.lora_alpha}")
         
         model = get_peft_model(model, config)
     
