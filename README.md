@@ -29,6 +29,12 @@ To run the notebook, execute the following command:
 bash lora_finetune.sh
 ```
 
+During training, you can check your GPU usage:
+
+```bash
+watch -n 0.5 -c gpustat -cp --color
+```
+
 Merge the LoRA weights with the base model using the following command:
 
 ```bash
@@ -63,6 +69,26 @@ Each line in the JSONL manifest file represents a single audio sample with its t
 ### Preparing SAP Dataset
 
 The SAP dataset includes recordings from individuals with atypical speech patterns. 
+
+#### Downloading SAP Dataset
+
+First download SAP dataset to `/path/to/sap` and extract all the tar files.
+
+```bash
+cd /path/to/sap/Train
+for i in $(seq -f "%03g" 0 16); do tar xvf SpeechAccessibility_2025-03-31_$i.tar; done
+tar xvf SpeechAccessibility_2025-03-31_Train_Only_Json.tar
+
+cd /path/to/sap/Dev
+for i in $(seq -f "%03g" 0 2); do tar xvf SpeechAccessibility_2025-03-31_$i.tar; done
+tar xvf SpeechAccessibility_2025-03-31_Dev_Only_Json.tar
+```
+
+This will let you get a bunch of tar files, and you need to extract all of them.
+
+```bash
+for f in *.tar; do [[ $f != SpeechAccessibility_* ]] && tar xvf "$f"; done
+```
 
 #### Preprocessing SAP Audio Files
 
