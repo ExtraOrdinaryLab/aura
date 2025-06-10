@@ -6,7 +6,7 @@ TEST_MANIFEST="/home/jovyan/workspace/aura/manifest/eval2000.jsonl"
 
 LEARNING_RATE="1e-4"
 
-OUTPUT_DIR="output/full/sap"
+OUTPUT_DIR="output/lora/sap"
 
 CUDA_VISIBLE_DEVICES=0 python lora_finetune.py \
     --train_data $TRAIN_MANIFEST \
