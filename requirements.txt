@@ -3,6 +3,7 @@ torch==2.6.0
 torchvision==0.21.0
 torchaudio==2.6.0
 rich
+flask
 python-dotenv
 scikit-learn==1.6.1
 librosa
@@ -29,6 +30,7 @@ webdataset==0.2.111
 editdistance==0.8.1
 zhconv==1.4.3
 soundfile==0.13.1
+kokoro>=0.9.4
 https://github.com/pyannote/pyannote-audio/archive/refs/tags/3.3.1.tar.gz
 git+https://github.com/ExtraOrdinaryLab/AudioAugment.git
 git+https://github.com/facebookresearch/WavAugment.git
