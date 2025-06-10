@@ -1,7 +1,9 @@
 #!/bin/bash
 
-CHECKPOINT_DIR="/path/to/checkpoint-best"
+CHECKPOINT_DIR="output/lora/sap/whisper-tiny/checkpoint-best"
+OUTPUT_DIR="models/lora/sap"
 
 python merge_lora.py \
     --lora_model $CHECKPOINT_DIR \
-    --output_dir models/lora
+    --output_dir $OUTPUT_DIR \
+    --local_files_only True
