@@ -8,6 +8,16 @@ LEARNING_RATE="1e-4"
 
 OUTPUT_DIR="output/lora/sap"
 
+# Load environment variables from .env file
+set -o allexport
+source .env
+set +o allexport
+
+# Now you can use the variables
+echo "HF_TOKEN is: $HF_TOKEN"
+echo "WANDB_PROJECT is $WANDB_PROJECT"
+echo "WANDB_API_KEY is: $WANDB_API_KEY"
+
 CUDA_VISIBLE_DEVICES=0 python lora_finetune.py \
     --train_data $TRAIN_MANIFEST \
     --test_data $TEST_MANIFEST \
