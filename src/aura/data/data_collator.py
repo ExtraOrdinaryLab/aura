@@ -42,4 +42,8 @@ class DataCollatorSpeechSeq2SeqWithPadding:
         # Add the processed labels back to the batch
         batch["labels"] = labels
 
+        # Add the domain information to the batch
+        if features[0].get("domain", None) is not None:
+            batch["domain"] = torch.tensor([feature["domain"] for feature in features])
+
         return batch

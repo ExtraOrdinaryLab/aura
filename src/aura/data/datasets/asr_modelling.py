@@ -271,6 +271,7 @@ class AudioDataset(Dataset):
         audio_file_path = data_entry["audio"]['path']
         transcript = data_entry["sentences"] if self.use_timestamps else data_entry["sentence"]
         language = data_entry.get("language", None)
+        domain = data_entry.get("domain", None)
         
         # Load audio data
         if 'start_time' not in data_entry["audio"].keys():
@@ -301,7 +302,7 @@ class AudioDataset(Dataset):
                 target_sample_rate=self.sample_rate
             )
             
-        return audio_sample, original_sample_rate, transcript, language
+        return audio_sample, original_sample_rate, transcript, language, domain
 
     def _load_timestamps_transcript(self, transcript: List[dict]) -> Dict[str, List[int]]:
         """
@@ -352,7 +353,7 @@ class AudioDataset(Dataset):
         """
         try:
             # Get audio data, sample rate, and text from data list
-            audio_sample, sample_rate, transcript, language = self._get_list_data(index=index)
+            audio_sample, sample_rate, transcript, language, domain = self._get_list_data(index=index)
             
             # Set language for individual data entries
             self.processor.tokenizer.set_prefix_tokens(
@@ -379,7 +380,10 @@ class AudioDataset(Dataset):
                 # Use <|nospeech|> token if no text is available
                 data = self.processor(audio=audio_sample, sampling_rate=self.sample_rate)
                 data['labels'] = [self.start_of_transcript_token, self.no_speech_token, self.end_of_text_token]
-                
+            
+            if domain is not None:
+                data['domain'] = domain
+
             return data
             
         except Exception as error:
