@@ -40,3 +40,61 @@ Evaluate the model on the SAP and TORGO datasets using the following command:
 ```bash
 bash evaluate.sh
 ```
+
+## Data Preparation
+
+The data is prepared in JSONL manifest files that feed into the training and evaluation pipelines.
+
+### Manifest File Format
+
+Each line in the JSONL manifest file represents a single audio sample with its transcription and metadata. The format is as follows:
+
+```json
+{
+  "audio": {
+    "path": "/path/to/audio/file.wav"
+  },
+  "sentence": "Transcription of the audio file",
+  "sentences": [],
+  "duration": 14.07
+}
+```
+
+### Preparing SAP Dataset
+
+The SAP dataset includes recordings from individuals with atypical speech patterns. 
+
+#### Preprocessing SAP Audio Files
+
+Before creating manifests, SAP audio files need to be preprocessed because some WAV files are not mono-channel. Convert them to mono with a 16kHz sample rate using:
+
+```bash
+python sap_mono_converter.py --input-dir /path/to/sap --sample-rate 16000 --output-suffix mono-16k
+```
+
+#### Creating SAP Manifests
+
+After preprocessing, create the manifest files:
+
+```bash
+python prepare_sap.py --sap-dir /path/to/sap-mono-16k --output-dir /path/to/output
+```
+
+This will generate `train.jsonl` and `dev.jsonl` files for training and validation.
+
+### Preparing TORGO Dataset
+
+The TORGO dataset contains speech recordings from individuals with cerebral palsy (CP) and amyotrophic lateral sclerosis (ALS), classified by severity levels:
+
+```bash
+python prepare_torgo.py --torgo-dir /path/to/torgo --output-dir /path/to/output
+```
+
+This script processes the TORGO dataset and generates three JSONL files:
+- `torgo_severe.jsonl`: Contains recordings from speakers with severe dysarthria
+- `torgo_moderate.jsonl`: Contains recordings from speakers with moderate dysarthria
+- `torgo_mild.jsonl`: Contains recordings from speakers with mild dysarthria
+
+## License
+
+This project is licensed under the MIT License.
